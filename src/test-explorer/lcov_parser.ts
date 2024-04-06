@@ -307,14 +307,14 @@ export async function parseLcov(
             info.lineCoverage.set(
               lineNumber,
               new vscode.StatementCoverage(
-                hitCount > 0,
+                hitCount,
                 new vscode.Position(lineNumber, 0),
               ),
             );
           } else {
             const coverageEntry = info.lineCoverage.get(lineNumber);
-            assert(typeof coverageEntry.executed == "boolean");
-            coverageEntry.executed ||= hitCount > 0;
+            assert(typeof coverageEntry.executed == "number");
+            coverageEntry.executed += hitCount;
           }
           break;
         }
