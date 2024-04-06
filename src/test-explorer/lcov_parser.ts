@@ -180,6 +180,18 @@ export async function parseLcov(
       new Map();
   }
   const infosByFile: Map<string, FileCoverageInfo> = new Map();
+  // For some languages we have hit counts ("was executed 10 times") while
+  // for other languages we might only have boolean information whether
+  // a line was executed or not. The LCOV file format does not distinguish
+  // between those two cases, and for languages where we only have boolean
+  // information, it uses a "1".
+  // There is no way to know for sure, based on the LCOV file, if a "1" actually
+  // imlies "was execute 1 time(s)" or "was executed at least once". Hence, we
+  // resort to a somewhat crude heuristic here: If we saw any hit count > 1,
+  // we assume the LCOV file has actual execution counts, otherwise we assume
+  // that it only contains boolean "was hit" information.
+  let sawLineHitCounts = false;
+  let sawBranchCounts = false;
   for (const block of lcov.split(/end_of_record(\n|$)/)) {
     const functionsByName: Map<string, vscode.DeclarationCoverage> = new Map();
     let info: FileCoverageInfo;
