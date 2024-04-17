@@ -15,6 +15,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { blaze_query } from "../protos";
+import { assert } from "../assert";
 
 /**
  * Icons to use for specific rule classes.
@@ -25,32 +26,34 @@ import { blaze_query } from "../protos";
  * application/extension/framework targets are shown with folder-like icons
  * because those bundles are conceptually folders.
  */
-const SPECIFIC_RULE_CLASS_ICONS: Record<string, string> = {
-  android_binary: "android_binary",
-  apple_bundle_import: "resource_bundle",
-  apple_resource_bundle: "resource_bundle",
-  config_setting: "config_setting",
-  filegroup: "filegroup",
-  genrule: "genrule",
-  ios_application: "apple_application",
-  ios_extension: "apple_executable_bundle",
-  ios_framework: "apple_framework",
-  macos_application: "apple_application",
-  macos_bundle: "apple_executable_bundle",
-  macos_extension: "apple_executable_bundle",
-  objc_bundle: "resource_bundle",
-  objc_bundle_library: "resource_bundle",
-  objc_framework: "apple_framework",
-  objc_import: "library",
-  proto_library: "proto",
-  swift_c_module: "library",
-  swift_import: "library",
-  test_suite: "test_suite",
-  tvos_application: "apple_application",
-  tvos_extension: "apple_executable_bundle",
-  watchos_application: "apple_application",
-  watchos_extension: "apple_executable_bundle",
-};
+const SPECIFIC_RULE_CLASS_ICONS = new Map(
+  Object.entries({
+    android_binary: "android_binary",
+    apple_bundle_import: "resource_bundle",
+    apple_resource_bundle: "resource_bundle",
+    config_setting: "config_setting",
+    filegroup: "filegroup",
+    genrule: "genrule",
+    ios_application: "apple_application",
+    ios_extension: "apple_executable_bundle",
+    ios_framework: "apple_framework",
+    macos_application: "apple_application",
+    macos_bundle: "apple_executable_bundle",
+    macos_extension: "apple_executable_bundle",
+    objc_bundle: "resource_bundle",
+    objc_bundle_library: "resource_bundle",
+    objc_framework: "apple_framework",
+    objc_import: "library",
+    proto_library: "proto",
+    swift_c_module: "library",
+    swift_import: "library",
+    test_suite: "test_suite",
+    tvos_application: "apple_application",
+    tvos_extension: "apple_executable_bundle",
+    watchos_application: "apple_application",
+    watchos_extension: "apple_executable_bundle",
+  }),
+);
 
 /**
  * Returns a string or {@code vscode.ThemeIcon} representing the icon to display
@@ -61,8 +64,9 @@ const SPECIFIC_RULE_CLASS_ICONS: Record<string, string> = {
 export function getBazelRuleIcon(
   target: blaze_query.ITarget,
 ): string | vscode.ThemeIcon {
+  assert(!!target.rule);
   const ruleClass = target.rule.ruleClass;
-  let iconName = SPECIFIC_RULE_CLASS_ICONS[ruleClass];
+  let iconName = SPECIFIC_RULE_CLASS_ICONS.get(ruleClass);
   if (!iconName) {
     if (ruleClass.endsWith("_binary")) {
       iconName = "binary";

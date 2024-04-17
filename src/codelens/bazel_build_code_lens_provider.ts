@@ -19,6 +19,7 @@ import { getTargetsForBuildFile } from "../bazel";
 import { getDefaultBazelExecutablePath } from "../extension/configuration";
 import { blaze_query } from "../protos";
 import { CodeLensCommandAdapter } from "./code_lens_command_adapter";
+import { assert } from "../assert";
 
 /** Provids CodeLenses for targets in Bazel BUILD files. */
 export class BazelBuildCodeLensProvider implements vscode.CodeLensProvider {
@@ -108,6 +109,7 @@ export class BazelBuildCodeLensProvider implements vscode.CodeLensProvider {
     const result: vscode.CodeLens[] = [];
 
     for (const target of queryResult.target) {
+      assert(!!target.rule?.location);
       const location = new QueryLocation(target.rule.location);
       const targetName = target.rule.name;
       const ruleClass = target.rule.ruleClass;

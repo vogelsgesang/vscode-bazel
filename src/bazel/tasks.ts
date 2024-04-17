@@ -23,7 +23,7 @@ export const TASK_TYPE = "bazel";
 /** Information about a running Bazel task. */
 export class BazelTaskInfo {
   /** start time (for internal performance tracking). */
-  public startTime: [number, number];
+  public startTime: [number, number] = process.hrtime();
 }
 
 /**
@@ -67,7 +67,7 @@ class BazelTaskProvider implements vscode.TaskProvider {
     // a ShellExecution for it.
 
     // Infer `BazelWorkspaceInfo` from `scope`
-    let workspaceInfo: BazelWorkspaceInfo;
+    let workspaceInfo: BazelWorkspaceInfo | undefined;
     if (
       task.scope === vscode.TaskScope.Global ||
       task.scope === vscode.TaskScope.Workspace
@@ -101,7 +101,6 @@ function onTaskStart(event: vscode.TaskStartEvent) {
   }
   const definition = task.definition as BazelTaskDefinition;
   const bazelTaskInfo = new BazelTaskInfo();
-  bazelTaskInfo.startTime = process.hrtime();
   definition.bazelTaskInfo = bazelTaskInfo;
 }
 
@@ -128,9 +127,11 @@ function onTaskProcessEnd(event: vscode.TaskProcessEndEvent) {
   // Show a notification that the build is finished
   if (bazelTaskInfo) {
     const rawExitCode = event.exitCode;
-
-    const exitCode = parseExitCode(rawExitCode, command);
-    if (rawExitCode !== 0) {
+    if (rawExitCode === undefined) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      vscode.window.showErrorMessage(`Bazel ${command} was cancelled.`);
+    } else if (rawExitCode !== 0) {
+      const exitCode = parseExitCode(rawExitCode, command);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       vscode.window.showErrorMessage(
         `Bazel ${command} failed: ${exitCodeToUserString(exitCode)}`,
@@ -171,10 +172,10 @@ export function createBazelTaskFromDefinition(
   const command = taskDefinition.command;
   const bazelConfigCmdLine =
     vscode.workspace.getConfiguration("bazel.commandLine");
-  const startupOptions = bazelConfigCmdLine.get<string[]>("startupOptions");
+  const startupOptions = bazelConfigCmdLine.get<string[]>("startupOptions")!;
   const addCommandArgs = command === "build" || command === "test";
   const commandArgs = addCommandArgs
-    ? bazelConfigCmdLine.get<string[]>("commandArgs")
+    ? bazelConfigCmdLine.get<string[]>("commandArgs")!
     : [];
 
   const args = startupOptions

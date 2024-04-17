@@ -69,7 +69,7 @@ import { assert } from "console";
 async function bazelGetTargetOutput(
   target: string,
   options: string[] = [],
-): Promise<string> {
+): Promise<string | undefined> {
   // Workaround for https://github.com/microsoft/vscode/issues/167970
   if (Array.isArray(target)) {
     options = (target[1] || []) as string[];
@@ -110,7 +110,7 @@ async function bazelGetTargetOutput(
  * If there are multiple outputs, a quick-pick window will be opened asking the
  * user to choose one.
  */
-async function bazelInfo(key: string): Promise<string> {
+async function bazelInfo(key: string): Promise<string | undefined> {
   const workspaceInfo = await BazelWorkspaceInfo.fromWorkspaceFolders();
   if (!workspaceInfo) {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

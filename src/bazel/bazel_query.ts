@@ -67,8 +67,8 @@ export class BazelQuery extends BazelCommand {
     const result = blaze_query.QueryResult.decode(buffer);
     if (sortByRuleName) {
       const sorted = result.target.sort((t1, t2) => {
-        const n1 = t1.rule.name;
-        const n2 = t2.rule.name;
+        const n1 = t1.rule?.name ?? "";
+        const n2 = t2.rule?.name ?? "";
         if (n1 > n2) {
           return 1;
         }

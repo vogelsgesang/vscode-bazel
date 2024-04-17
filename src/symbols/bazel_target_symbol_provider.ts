@@ -19,6 +19,7 @@ import { BazelWorkspaceInfo, QueryLocation } from "../bazel";
 import { getTargetsForBuildFile } from "../bazel";
 import { getDefaultBazelExecutablePath } from "../extension/configuration";
 import { blaze_query } from "../protos";
+import { assert } from "../assert";
 
 /** Provids Symbols for targets in Bazel BUILD files. */
 export class BazelTargetSymbolProvider implements DocumentSymbolProvider {
@@ -52,6 +53,7 @@ export class BazelTargetSymbolProvider implements DocumentSymbolProvider {
     const result: vscode.DocumentSymbol[] = [];
 
     for (const target of queryResult.target) {
+      assert(!!target.rule?.location);
       const location = new QueryLocation(target.rule.location);
       let targetName = target.rule.name;
 

@@ -56,10 +56,12 @@ export async function activate(context: vscode.ExtensionContext) {
   completionItemProvider.refresh();
 
   const config = vscode.workspace.getConfiguration("bazel");
-  const lspEnabled = !!config.get<string>("lsp.command");
+  const lspCommand = config.get<string>("lsp.command");
+  const lspEnabled = !!lspCommand;
 
   if (lspEnabled) {
-    const lspClient = createLsp(config);
+    const args = config.get<string[]>("lsp.args");
+    const lspClient = createLsp(lspCommand, args);
 
     context.subscriptions.push(
       lspClient,
@@ -166,10 +168,7 @@ export function deactivate() {
   // Nothing to do here.
 }
 
-function createLsp(config: vscode.WorkspaceConfiguration) {
-  const command = config.get<string>("lsp.command");
-  const args = config.get<string[]>("lsp.args");
-
+function createLsp(command: string, args: string[] | undefined) {
   const serverOptions: ServerOptions = {
     args,
     command,
@@ -242,7 +241,7 @@ async function bazelBuildTargetWithDebugging(
   const bazelConfigCmdLine =
     vscode.workspace.getConfiguration("bazel.commandLine");
   const startupOptions = bazelConfigCmdLine.get<string[]>("startupOptions");
-  const commandArgs = bazelConfigCmdLine.get<string[]>("commandArgs");
+  const commandArgs = bazelConfigCmdLine.get<string[]>("commandArgs")!;
 
   const commandOptions = adapter.getBazelCommandOptions();
 

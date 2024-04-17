@@ -9,7 +9,6 @@
         "sourceMap": true,
         "rootDir": ".",
         "strict": true,
-        "strictNullChecks": false,
         "allowJs": true,
     },
     "exclude": [

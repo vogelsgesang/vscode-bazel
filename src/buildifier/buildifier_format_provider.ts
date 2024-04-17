@@ -26,7 +26,7 @@ export class BuildifierFormatProvider
     document: vscode.TextDocument,
   ): Promise<vscode.TextEdit[]> {
     const bazelConfig = vscode.workspace.getConfiguration("bazel");
-    const applyLintFixes = bazelConfig.get<boolean>("buildifierFixOnFormat");
+    const applyLintFixes = bazelConfig.get<boolean>("buildifierFixOnFormat")!;
 
     const fileContent = document.getText();
     const type = getBuildifierFileType(document.uri.fsPath);
@@ -54,6 +54,7 @@ export class BuildifierFormatProvider
     } catch (err: any) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       vscode.window.showErrorMessage(`${err}`);
+      return [];
     }
   }
 }

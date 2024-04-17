@@ -28,12 +28,6 @@ export class BuildifierDiagnosticsManager implements vscode.Disposable {
     vscode.languages.createDiagnosticCollection("buildifier");
 
   /**
-   * Disposables registered by the manager that should be disposed when the
-   * manager itself is disposed.
-   */
-  private disposables: vscode.Disposable[];
-
-  /**
    * Initializes a new buildifier diagnostics manager and hooks into workspace
    * and window events so that diagnostics are updated live.
    */
@@ -105,8 +99,6 @@ export class BuildifierDiagnosticsManager implements vscode.Disposable {
   }
 
   public dispose() {
-    for (const disposable of this.disposables) {
-      disposable.dispose();
-    }
+    this.diagnosticsCollection.dispose();
   }
 }
