@@ -55,6 +55,7 @@ jobs:
         shell: bash
         run: |
           filename=`echo vscode-bazel-*.vsix`;
+          echo $filename
           gh release upload ${{ steps.release.outputs.tag_name }} "$filename"
         env:
           GH_TOKEN: ${{ github.token }}
